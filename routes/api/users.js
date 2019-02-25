@@ -12,6 +12,19 @@ router.get('/user', auth.required, function(req, res, next){
   }).catch(next);
 });
 
+router.get('/users', auth.required, function(req, res, next){
+  User.find({}).then(function(user){
+    if(!user){ return res.sendStatus(401); }
+    let population = [];
+    user.forEach(element => {
+      population.push(element.toTicketJSON());
+      });
+    return res.json({
+      user: population
+    });
+  }).catch(next);
+});
+
 router.put('/user', auth.required, function(req, res, next){
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
@@ -32,7 +45,6 @@ router.put('/user', auth.required, function(req, res, next){
     if(typeof req.body.user.password !== 'undefined'){
       user.setPassword(req.body.user.password);
     }
-
     return user.save().then(function(){
       return res.json({user: user.toAuthJSON()});
     });
@@ -66,7 +78,6 @@ router.post('/users', function(req, res, next){
   user.username = req.body.user.username;
   user.email = req.body.user.email;
   user.setPassword(req.body.user.password);
-
   user.save().then(function(){
     return res.json({user: user.toAuthJSON()});
   }).catch(next);

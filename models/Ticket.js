@@ -3,8 +3,10 @@ var uniqueValidator = require('mongoose-unique-validator');
 var slug = require('slug');
 var User = mongoose.model('User');
 
-var ArticleSchema = new mongoose.Schema({
+var TicketSchema = new mongoose.Schema({
   slug: {type: String, lowercase: true, unique: true},
+  technician: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   title: String,
   description: String,
   body: String,
@@ -14,9 +16,9 @@ var ArticleSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {timestamps: true});
 
-ArticleSchema.plugin(uniqueValidator, {message: 'is already taken'});
+TicketSchema.plugin(uniqueValidator, {message: 'is already taken'});
 
-ArticleSchema.pre('validate', function(next){
+TicketSchema.pre('validate', function(next){
   if(!this.slug)  {
     this.slugify();
   }
@@ -24,11 +26,21 @@ ArticleSchema.pre('validate', function(next){
   next();
 });
 
-ArticleSchema.methods.slugify = function() {
-  this.slug = slug(this.title) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36);
+TicketSchema.methods.slugify = function() {
+  this.slug = slug('REF') + '-' + makeRef().toString(36);
 };
 
-ArticleSchema.methods.updateFavoriteCount = function() {
+function makeRef() {
+  var ref = "";  
+  var entry = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 7; i++)
+    ref += entry.charAt(Math.floor(Math.random() * entry.length));
+
+  return ref;
+}
+
+TicketSchema.methods.updateFavoriteCount = function() {
   var article = this;
 
   return User.count({favorites: {$in: [article._id]}}).then(function(count){
@@ -38,7 +50,7 @@ ArticleSchema.methods.updateFavoriteCount = function() {
   });
 };
 
-ArticleSchema.methods.toJSONFor = function(user){
+TicketSchema.methods.toJSONFor = function(user){
   return {
     slug: this.slug,
     title: this.title,
@@ -49,8 +61,10 @@ ArticleSchema.methods.toJSONFor = function(user){
     tagList: this.tagList,
     favorited: user ? user.isFavorite(this._id) : false,
     favoritesCount: this.favoritesCount,
-    author: this.author.toProfileJSONFor(user)
+    author: this.author.toProfileJSONFor(user),
+    technician: this.technician,
+    client: this.client
   };
 };
 
-mongoose.model('Article', ArticleSchema);
+mongoose.model('Ticket', TicketSchema);

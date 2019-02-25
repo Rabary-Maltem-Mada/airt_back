@@ -1,13 +1,14 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
-var Article = mongoose.model('Article');
+var Ticket = mongoose.model('Ticket');
+var Client = mongoose.model('Client');
 var Comment = mongoose.model('Comment');
 var User = mongoose.model('User');
 var auth = require('../auth');
 
 // Preload article objects on routes with ':article'
 router.param('article', function(req, res, next, slug) {
-  Article.findOne({ slug: slug})
+  Ticket.findOne({ slug: slug})
     .populate('author')
     .then(function (article) {
       if (!article) { return res.sendStatus(404); }
@@ -63,13 +64,13 @@ router.get('/', auth.optional, function(req, res, next) {
     }
 
     return Promise.all([
-      Article.find(query)
+      Ticket.find(query)
         .limit(Number(limit))
         .skip(Number(offset))
         .sort({createdAt: 'desc'})
         .populate('author')
         .exec(),
-      Article.count(query).exec(),
+        Ticket.count(query).exec(),
       req.payload ? User.findById(req.payload.id) : null,
     ]).then(function(results){
       var articles = results[0];
@@ -102,12 +103,12 @@ router.get('/feed', auth.required, function(req, res, next) {
     if (!user) { return res.sendStatus(401); }
 
     Promise.all([
-      Article.find({ author: {$in: user.following}})
+      Ticket.find({ author: {$in: user.following}})
         .limit(Number(limit))
         .skip(Number(offset))
         .populate('author')
         .exec(),
-      Article.count({ author: {$in: user.following}})
+        Ticket.count({ author: {$in: user.following}})
     ]).then(function(results){
       var articles = results[0];
       var articlesCount = results[1];
@@ -122,18 +123,33 @@ router.get('/feed', auth.required, function(req, res, next) {
   });
 });
 
+// new ticket 
 router.post('/', auth.required, function(req, res, next) {
-  User.findById(req.payload.id).then(function(user){
-    if (!user) { return res.sendStatus(401); }
 
-    var article = new Article(req.body.article);
-
-    article.author = user;
-
-    return article.save().then(function(){
-      console.log(article.author);
-      return res.json({article: article.toJSONFor(user)});
-    });
+  Promise.all([ 
+    User.findById(req.payload.id),
+    User.findById(req.body.article.technician),
+    Client.find({name: req.body.article.client}),
+    console.log('client ' + req.body.article.client)
+    ]).then(function(result) {
+      var article = new Ticket(req.body.article);
+      article.author = result[0];
+      article.technician = result[1];
+      console.log('111111111111111111111111111111');
+      if (!result[2]) {
+        var client = new Client();
+        client.name = req.body.article.client;
+        client.save().then(function(err, client){
+          console.log('2222222222222222222222222222');
+          return console.log(client.id);
+        })
+      } else {
+        article.client = result[2].id;
+        console.log('333333333333333333333333');
+        return article.save().then(function(){
+          return res.json({article: article.toJSONFor(result[0])});
+        })
+      }
   }).catch(next);
 });
 

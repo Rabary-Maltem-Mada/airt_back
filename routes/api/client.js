@@ -1,11 +1,11 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
-var Ticket = mongoose.model('Ticket');
+var Client = mongoose.model('Client');
 
 // return a list of tags
 router.get('/', function(req, res, next) {
-  Ticket.find().distinct('tagList').then(function(tags){
-    return res.json({tags: tags});
+  Client.find().then(function(client){
+    return res.json({clients: client});
   }).catch(next);
 });
 

@@ -9,7 +9,7 @@ var UserSchema = new mongoose.Schema({
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   bio: String,
   image: String,
-  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Article' }],
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   hash: String,
   salt: String
@@ -45,6 +45,15 @@ UserSchema.methods.toAuthJSON = function(){
     email: this.email,
     token: this.generateJWT(),
     bio: this.bio,
+    image: this.image
+  };
+};
+
+UserSchema.methods.toTicketJSON = function(){
+  return {
+    id: this._id,
+    username: this.username,
+    email: this.email,
     image: this.image
   };
 };

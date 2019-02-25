@@ -1,4 +1,5 @@
 language: node_js
+<<<<<<< HEAD
 node_js: "8"
 
 sudo: required
@@ -8,3 +9,14 @@ install: yarn
 
 before_script: yarn start & sleep 5
 script: yarn test
+=======
+
+node_js:
+  - "10"
+
+git:
+  depth: false
+
+script:
+  - cd etc && ./push.sh
+>>>>>>> 01665af110cd5416b70ba3bc268de5c14a02fe5e

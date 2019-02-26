@@ -44,7 +44,7 @@ TicketSchema.methods.updateFavoriteCount = function() {
   var article = this;
 
   return User.count({favorites: {$in: [article._id]}}).then(function(count){
-    article.favoritesCount = count;
+    article.favoritesCount = article.favoritesCount.concat([count]);
 
     return article.save();
   });
@@ -66,5 +66,6 @@ TicketSchema.methods.toJSONFor = function(user){
     client: this.client
   };
 };
+
 
 mongoose.model('Ticket', TicketSchema);

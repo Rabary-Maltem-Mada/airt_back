@@ -69,6 +69,8 @@ router.get('/', auth.optional, function(req, res, next) {
         .skip(Number(offset))
         .sort({createdAt: 'desc'})
         .populate('author')
+        .populate('technician')
+        .populate('client')
         .exec(),
         Ticket.count(query).exec(),
       req.payload ? User.findById(req.payload.id) : null,
@@ -107,6 +109,8 @@ router.get('/feed', auth.required, function(req, res, next) {
         .limit(Number(limit))
         .skip(Number(offset))
         .populate('author')
+        .populate('technician')
+        .populate('client')
         .exec(),
         Ticket.count({ author: {$in: user.following}})
     ]).then(function(results){
@@ -125,31 +129,31 @@ router.get('/feed', auth.required, function(req, res, next) {
 
 // new ticket 
 router.post('/', auth.required, function(req, res, next) {
+  var article = new Ticket(req.body.article);
+  var client = new Client();
 
+  Client.findOne({name: req.body.article.client}).then(function(result) {
+    if (!result) {
+      client.name = req.body.article.client;
+      client.save().then(function(client) {
+        article.client = client;
+      })
+    } else {
+      article.client = result;
+    }
+  })
+  
   Promise.all([ 
     User.findById(req.payload.id),
-    User.findById(req.body.article.technician),
-    Client.find({name: req.body.article.client}),
-    console.log('client ' + req.body.article.client)
+    User.findById(req.body.article.technician)
     ]).then(function(result) {
-      var article = new Ticket(req.body.article);
+      
       article.author = result[0];
       article.technician = result[1];
-      console.log('111111111111111111111111111111');
-      if (!result[2]) {
-        var client = new Client();
-        client.name = req.body.article.client;
-        client.save().then(function(err, client){
-          console.log('2222222222222222222222222222');
-          return console.log(client.id);
-        })
-      } else {
-        article.client = result[2].id;
-        console.log('333333333333333333333333');
-        return article.save().then(function(){
-          return res.json({article: article.toJSONFor(result[0])});
-        })
-      }
+
+      return article.save().then(function(){
+        return res.json({article: article.toJSONFor(result[0])});
+      })
   }).catch(next);
 });
 

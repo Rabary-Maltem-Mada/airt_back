@@ -131,7 +131,6 @@ router.get('/feed', auth.required, function(req, res, next) {
 router.post('/', auth.required, function(req, res, next) {
   var article = new Ticket(req.body.article);
   var client = new Client();
-
   Client.findOne({name: req.body.article.client}).then(function(result) {
     if (!result) {
       client.name = req.body.article.client;

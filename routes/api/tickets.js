@@ -144,7 +144,7 @@ router.post('/', auth.required, function(req, res, next) {
   
   Promise.all([ 
     User.findById(req.payload.id),
-    User.findById(req.body.article.technician)
+    User.findOne({username: req.body.article.technician})
     ]).then(function(result) {
       
       article.author = result[0];

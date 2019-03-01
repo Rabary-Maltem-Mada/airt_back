@@ -8,7 +8,7 @@ var TicketSchema = new mongoose.Schema({
   technician: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   title: String,
-  description: String,
+  status: String,
   body: String,
   favoritesCount: {type: Number, default: 0},
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
@@ -54,7 +54,7 @@ TicketSchema.methods.toJSONFor = function(user){
   return {
     slug: this.slug,
     title: this.title,
-    description: this.description,
+    status: this.status,
     body: this.body,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,

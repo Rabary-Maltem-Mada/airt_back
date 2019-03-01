@@ -127,6 +127,32 @@ router.get('/feed', auth.required, function(req, res, next) {
   });
 });
 
+// Get all
+
+router.get('/all', auth.required, function(req, res, next) {
+  var limit = 20;
+  var offset = 0;
+
+  if(typeof req.query.limit !== 'undefined'){
+    limit = req.query.limit;
+  }
+
+  if(typeof req.query.offset !== 'undefined'){
+    offset = req.query.offset;
+  }
+
+  Ticket.find().then(function(ticket){
+    if (!ticket) { return res.sendStatus(401); }
+
+    return res.json({
+      tickets: ticket.map(function(tick){
+        return tick;
+      }),
+    });
+  });
+});
+
+
 // new ticket 
 router.post('/', auth.required, function(req, res, next) {
   var article = new Ticket(req.body.article);
@@ -135,7 +161,7 @@ router.post('/', auth.required, function(req, res, next) {
     if (!result) {
       client.name = req.body.article.client;
       client.save().then(function(client) {
-        article.client = client;
+        return article.client = client;
       })
     } else {
       article.client = result;
@@ -176,8 +202,8 @@ router.put('/:article', auth.required, function(req, res, next) {
         req.article.title = req.body.article.title;
       }
 
-      if(typeof req.body.article.description !== 'undefined'){
-        req.article.description = req.body.article.description;
+      if(typeof req.body.article.status !== 'undefined'){
+        req.article.status = req.body.article.status;
       }
 
       if(typeof req.body.article.body !== 'undefined'){

@@ -12,6 +12,7 @@ var UserSchema = new mongoose.Schema({
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   hash: String,
+  role: String,
   salt: String
 }, {timestamps: true});
 
@@ -43,6 +44,7 @@ UserSchema.methods.toAuthJSON = function(){
   return {
     username: this.username,
     email: this.email,
+    role: this.role,
     token: this.generateJWT(),
     bio: this.bio,
     image: this.image
@@ -54,6 +56,7 @@ UserSchema.methods.toTicketJSON = function(){
     id: this._id,
     username: this.username,
     email: this.email,
+    role: this.role,
     image: this.image
   };
 };
@@ -62,6 +65,7 @@ UserSchema.methods.toProfileJSONFor = function(user){
   return {
     username: this.username,
     bio: this.bio,
+    role: this.role,
     image: this.image || 'http://localhost/madadev/smiley-cyrus.jpg',
     following: user ? user.isFollowing(this._id) : false
   };

@@ -73,10 +73,12 @@ router.post('/users/login', function(req, res, next){
 });
 
 router.post('/users', function(req, res, next){
+  console.log(JSON.stringify(req.body));
   var user = new User();
 
   user.username = req.body.user.username;
   user.email = req.body.user.email;
+  user.role = req.body.user.role;
   user.setPassword(req.body.user.password);
   user.save().then(function(){
     return res.json({user: user.toAuthJSON()});

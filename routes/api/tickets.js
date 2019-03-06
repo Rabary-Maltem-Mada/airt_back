@@ -140,16 +140,38 @@ router.get('/all', auth.required, function(req, res, next) {
   if(typeof req.query.offset !== 'undefined'){
     offset = req.query.offset;
   }
-
-  Ticket.find().then(function(ticket){
-    if (!ticket) { return res.sendStatus(401); }
+  User.findById(req.payload.id).then(function(user){
+  Promise.all([
+    Ticket.find()
+      .limit(Number(limit))
+      .skip(Number(offset))
+      .populate('author')
+      .populate('technician')
+      .populate('client')
+      .exec(),
+      Ticket.count()
+  ]).then(function(results){
+    var articles = results[0];
+    console.log(articles);
+    var articlesCount = results[1];
 
     return res.json({
-      tickets: ticket.map(function(tick){
-        return tick;
+      articles: articles.map(function(article){
+        return article.toJSONFor(user);
       }),
+      articlesCount: articlesCount
     });
-  });
+  }).catch(next);
+});
+  // Ticket.find().then(function(ticket){
+  //   if (!ticket) { return res.sendStatus(401); }
+
+  //   return res.json({
+  //     tickets: ticket.map(function(tick){
+  //       return tick;
+  //     }),
+  //   });
+  // });
 });
 
 

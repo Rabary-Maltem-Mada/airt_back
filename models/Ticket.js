@@ -44,7 +44,7 @@ TicketSchema.methods.updateFavoriteCount = function() {
   var article = this;
 
   return User.count({favorites: {$in: [article._id]}}).then(function(count){
-    article.favoritesCount = article.favoritesCount.concat([count]);
+    article.favoritesCount = count;
 
     return article.save();
   });

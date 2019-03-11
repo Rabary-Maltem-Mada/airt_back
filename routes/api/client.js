@@ -19,7 +19,6 @@ router.get('/', async function(req, res, next) {
         cl.Tickets = ticlient;
         return cl;
       })
-      
     })
 
     Promise.all(listAsync).then((data) => {

@@ -23,6 +23,7 @@
     "errorhandler": "1.4.3",
     "express": "^4.16.4",
     "express-jwt": "3.3.0",
+    "express-list-endpoints": "^4.0.1",
     "express-session": "^1.15.6",
     "jsonwebtoken": "7.1.9",
     "method-override": "2.3.5",

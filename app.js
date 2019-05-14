@@ -26,13 +26,13 @@ app.use((req, res, next) => {
 // Normal express config defaults
 app.use(require('morgan')('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '2mb'}));
 
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/public'));
 
 app.use(session({ secret: 'airt1l', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
-
+app.set('views', './dist/browser');
 if (!isProduction) {
   app.use(errorhandler());
 }
@@ -86,8 +86,10 @@ app.use(function(err, req, res, next) {
   }});
 });
 
+
 // finally, let's start our server...
 var server = app.listen( process.env.PORT || 3000, function(){
   console.log('Listening on port ' + server.address().port);
   console.log(listEndpoints(app));
 });
+

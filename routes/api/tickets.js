@@ -321,6 +321,7 @@ router.post('/:article/comments', auth.required, function(req, res, next) {
     var comment = new Comment(req.body.comment);
     comment.article = req.article;
     comment.author = user;
+    comment.file = req.body.comment.file;
 
     return comment.save().then(function(){
       req.article.comments = req.article.comments.concat([comment]);

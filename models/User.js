@@ -9,6 +9,7 @@ var UserSchema = new mongoose.Schema({
   email: {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   bio: String,
   image: String,
+  cover: String,
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   hash: String,
@@ -47,7 +48,8 @@ UserSchema.methods.toAuthJSON = function(){
     role: this.role,
     token: this.generateJWT(),
     bio: this.bio,
-    image: this.image
+    image: this.image,
+    cover: this.cover
   };
 };
 
@@ -67,6 +69,7 @@ UserSchema.methods.toProfileJSONFor = function(user){
     bio: this.bio,
     role: this.role,
     image: this.image || 'http://localhost/madadev/smiley-cyrus.jpg',
+    cover: this.cover,
     following: user ? user.isFollowing(this._id) : false
   };
 };

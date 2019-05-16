@@ -1,8 +1,0 @@
-Créer une nouvelle page pour les techniciens
-
-Rediriger les users loggé selon leurs roles
-
-Ajouter les guard pour chaque routes
-
-File upload pour les techniciens
-File upload pour chaque user pour pdp et couverture

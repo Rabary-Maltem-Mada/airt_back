@@ -86,7 +86,10 @@ app.use(function(err, req, res, next) {
   }});
 });
 
-app.use('/public/uploads', express.static('public'));
+
+var dir = path.join(__dirname, './public/uploads');
+
+app.use(express.static(dir));
 
 // finally, let's start our server...
 var server = app.listen( process.env.PORT || 3000, function(){

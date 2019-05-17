@@ -11,6 +11,7 @@ const fs = require('fs');
 
 router.put('/files', (req, res) => {
   const file = req.body;
+  console.log('filenameeeeeeeeeeeeeeeeee',  req.body );
   const base64data = file.content.replace(/^data:.*,/, '');
   fs.writeFile(userFiles + file.name, base64data, 'base64', (err) => {
     if (err) {

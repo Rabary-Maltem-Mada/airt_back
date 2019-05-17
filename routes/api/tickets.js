@@ -317,12 +317,12 @@ router.get('/:article/comments', auth.optional, function(req, res, next){
 router.post('/:article/comments', auth.required, function(req, res, next) {
   User.findById(req.payload.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
-    console.log('req.body', JSON.stringify(req.body));
     var comment = new Comment(req.body.comment);
     comment.article = req.article;
     comment.author = user;
-    comment.file = req.body.comment.file;
-
+    req.body.comment.file.forEach((filename) => {
+      comment.file.concat('http://localhost:3000/api/public/uploads/'+ filename)
+    });
     return comment.save().then(function(){
       req.article.comments = req.article.comments.concat([comment]);
 

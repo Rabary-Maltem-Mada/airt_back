@@ -320,9 +320,10 @@ router.post('/:article/comments', auth.required, function(req, res, next) {
     var comment = new Comment(req.body.comment);
     comment.article = req.article;
     comment.author = user;
-    req.body.comment.file.forEach((filename) => {
-      comment.file.concat('http://localhost:3000/api/public/uploads/'+ filename)
-    });
+    // req.body.comment.file.forEach((filename) => {
+    //   let file = 'http://localhost:3000/api/public/uploads/' + filename;
+    //   comment.file.concat('eeeeeeeeeeeeee')
+    // });
     return comment.save().then(function(){
       req.article.comments = req.article.comments.concat([comment]);
 

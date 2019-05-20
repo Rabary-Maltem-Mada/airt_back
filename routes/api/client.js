@@ -31,14 +31,14 @@ router.get('/', async function(req, res, next) {
 
 
 router.post('/sendMail', function(req, res, next) {
-  console.log('poooooooost', req.body);
   var transporter = nodemailer.createTransport('smtps://rbrstart%40gmail.com:start0001@smtp.gmail.com');
   var data = req.body;
+  console.log('Email sent by', data.body.contactName);
   var mailOptions = {
-    from: data.contactEmail,
+    from: data.body.contactEmail,
     to: 'rabary@passion4humanity.com',
-    subject: 'Email sent by ' + data.contactName,
-    text: data.contactMessage
+    subject: 'Email sent by ' + data.body.contactName,
+    html: data.body.contactMessage
   };
 
   transporter.sendMail(mailOptions, function(error, info) {

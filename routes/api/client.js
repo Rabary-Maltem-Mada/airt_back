@@ -2,6 +2,7 @@ var router = require('express').Router();
 var mongoose = require('mongoose');
 var Client = mongoose.model('Client');
 var Ticket = mongoose.model('Ticket');
+var nodemailer = require('nodemailer');
 
 // return a list of tags
 router.get('/', async function(req, res, next) {
@@ -26,6 +27,28 @@ router.get('/', async function(req, res, next) {
     }); 
 
   }).catch(next);
+});
+
+
+router.post('/sendMail', function(req, res, next) {
+  console.log('poooooooost', req.body);
+  var transporter = nodemailer.createTransport('smtps://rbrstart%40gmail.com:start0001@smtp.gmail.com');
+  var data = req.body;
+  var mailOptions = {
+    from: data.contactEmail,
+    to: 'rabary@passion4humanity.com',
+    subject: 'Email sent by ' + data.contactName,
+    text: data.contactMessage
+  };
+
+  transporter.sendMail(mailOptions, function(error, info) {
+    if (error) {
+      return console.log(error);
+    }
+    console.log('Message sent: ' + info.response);
+    console.log('Data:' + data.contactName);
+  });
+  res.json(data);
 });
 
 module.exports = router;

@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 // Normal express config defaults
 app.use(require('morgan')('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({limit: '2mb'}));
+app.use(bodyParser.json({limit: '5mb'}));
 
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/public'));
@@ -90,6 +90,9 @@ app.use(function(err, req, res, next) {
 var dir = path.join(__dirname, './public/uploads');
 
 app.use(express.static(dir));
+
+// FOR MAILING
+
 
 // finally, let's start our server...
 var server = app.listen( process.env.PORT || 3000, function(){

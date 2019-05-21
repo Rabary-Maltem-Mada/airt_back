@@ -177,22 +177,24 @@ router.get('/all', auth.required, function(req, res, next) {
 
 // new ticket 
 router.post('/', auth.required, function(req, res, next) {
+
   var article = new Ticket(req.body.article);
   var client = new Client();
-  Client.findOne({name: req.body.article.client}).then(function(result) {
+  Client.findOne({name: req.body.article.client.name}).then(function(result) {
     if (!result) {
-      client.name = req.body.article.client;
+      client = req.body.article.client;
+      console.log('req.body.article.client', req.body.article.client.name)
       client.save().then(function(client) {
         return article.client = client;
       })
     } else {
-      article.client = result;
+      article.client = result;  
     }
   })
   
   Promise.all([ 
     User.findById(req.payload.id),
-    User.findOne({username: req.body.article.technician})
+    User.findOne({username: req.body.article.technician.username})
     ]).then(function(result) {
       
       article.author = result[0];

@@ -4,7 +4,20 @@ var Client = mongoose.model('Client');
 var Ticket = mongoose.model('Ticket');
 var nodemailer = require('nodemailer');
 
-// return a list of tags
+// add New client
+
+router.post('/add', function(req, res, next){
+  console.log(JSON.stringify(req.body));
+  var client = new Client();
+
+  client.email = req.body.email;
+  client.name = req.body.name;
+  client.save().then(function(){
+    return res.json({client: client.toJSONFor()});
+  }).catch(next);
+});
+
+// return a list of clients
 router.get('/', async function(req, res, next) {
   Client.find().sort({name: 1 }).then(function(client){
     var clients = JSON.parse(JSON.stringify(client));

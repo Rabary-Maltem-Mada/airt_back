@@ -37,7 +37,7 @@ router.post('/sendMail', function(req, res, next) {
   var mailOptions = {
     from: data.body.contactEmail,
     to: 'rabary@passion4humanity.com',
-    subject: 'Email sent by ' + data.body.contactName,
+    subject: 'Rapport du ticket N° ' + data.body.refTicket,
     html: data.body.contactMessage
   };
 

@@ -62,7 +62,7 @@ router.post('/users/login', function(req, res, next){
   if(!req.body.user.password){
     return res.status(422).json({errors: {password: "can't be blank"}});
   }
-console.log(req.body.user.email,   req.body.user.password );
+
   passport.authenticate('local', {session: false}, function(err, user, info){
     if(err){ return next(err); }
 
@@ -85,6 +85,14 @@ router.post('/users', function(req, res, next){
   user.setPassword(req.body.user.password);
   user.save().then(function(){
     return res.json({user: user.toAuthJSON()});
+  }).catch(next);
+});
+
+
+router.post('/users/check', function(req, res, next){
+  User.findOne({email: req.body.email}).then(function(user){
+     if(!user){ return res.json({errors: {email: "adresse email introuvable"}}); }
+    return res.status(200).json({user: user.username});
   }).catch(next);
 });
 

@@ -14,7 +14,9 @@ var UserSchema = new mongoose.Schema({
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   hash: String,
   role: String,
-  salt: String
+  salt: String,
+  resetPasswordToken: String,
+  resetPasswordExpires: Date
 }, {timestamps: true});
 
 UserSchema.plugin(uniqueValidator, {message: 'is already taken.'});

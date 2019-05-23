@@ -11,7 +11,7 @@ router.post('/:token', function(req, res, next) {
         function(done) {
           User.findOne({ resetPasswordToken: req.body.data.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
             if (!user) {
-              return res.status(200).json({errors: {token: "Password reset token is invalid or has expired."}});
+              return res.status(200).json({errors: "Password reset token is invalid or has expired."});
             }
             console.log('user', user)
             user.setPassword(req.body.data.newpass);
@@ -91,10 +91,9 @@ router.post('/:token', function(req, res, next) {
             if (error) {
               return console.log(error);
             }
-            console.log('Message sent: ' + info.response);
-            console.log('Data:' + 'rabary');
+            res.json({msg: "Félicitation, votre mot de passe a bien été modifié"});
           });
-          res.json({response: {succès: "succès"}});
+          res.json({msg: "Félicitation, votre mot de passe a bien été modifié"});
         },
         
 

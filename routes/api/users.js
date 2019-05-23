@@ -105,7 +105,7 @@ router.post('/users/check', function(req, res, next) {
     function(token, done) {
       User.findOne({ email: req.body.email }, function(err, user) {
         if (!user) {
-          return res.json({errors: {email: "No account with that email address exists."}});
+          return res.json({errors: "No account with that email address exists."});
         }
 
         user.resetPasswordToken = token;
@@ -188,10 +188,11 @@ router.post('/users/check', function(req, res, next) {
         if (error) {
           return console.log(error);
         }
-        console.log('Message sent: ' + info.response);
-        console.log('Data:' + 'rabary');
+        let message = "Un email a été envoyé à l'adresse : "+ req.body.email;
+        res.json({msg: message});
       });
-      res.json({response: {email: "succès"}});
+      // let message = "Un email a été envoyé à l'adresse :"+ req.body.email + ".";
+      // res.json({msg: message});
     }
   ], function(err) {
     if (err) return next(err);

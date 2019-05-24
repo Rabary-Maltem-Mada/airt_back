@@ -49,7 +49,6 @@ require('./models/Ticket');
 require('./models/Comment');
 require('./models/Client');
 require('./config/passport');
-
 app.use(require('./routes'));
 
 /// catch 404 and forward to error handler
@@ -100,3 +99,63 @@ var server = app.listen( process.env.PORT || 3000, function(){
   console.log(listEndpoints(app));
 });
 
+
+
+const io = require('socket.io')(server);
+
+// tableau id des utilisateurs connécté
+let userConnected = {};
+
+// Listening des connexions des utilisateurs
+io.on('connection', function (socket) {
+  
+  // Gestion des utilisateurs
+  socket.on('message', function(res){
+    if (res.tag === 'userConnected') {
+        userConnected[res.user] = {id: res.user, username: res.username, socketId: socket.id};
+        socket.broadcast.emit('message', {tag: 'notifUserConnected', body: res.username + 'est maintenant connécté'});
+        io.sockets.connected[socket.id].emit('message', {tag: 'welcomeMessage', body: 'Hello, you\'re welcome' + res.username});
+
+        // Envoi liste user connected
+        const tab = [];
+        for (const key in userConnected) {
+          if (userConnected.hasOwnProperty(key)) {
+            tab.push(userConnected[key]);
+          }
+        }
+        const msg = {tag: 'listUserConnected', users: tab}
+        io.emit('message', msg);
+        console.log('111111111111111111111111111111');
+    }
+
+    if ( res.tag === 'mp') {
+      for (var k in userConnected) {
+        if (k === res.idReceveur || k === res.idEnvoyeur) {
+          io.sockets.connected[userConnected[k].socketId].emit('message', res);
+        } 
+      }
+    }
+
+    if (res.tag === 'disconnect') {
+      var tab = [];
+        for (const key in userConnected) {
+          if (userConnected.hasOwnProperty(key) && key !== message.idUser) {
+            tab.push(userConnected[key]);
+          } else if (userConnected.hasOwnProperty(key) && key === message.idUser) {
+            if (io.sockets.connected[userConnected[key]]) {
+              io.sockets.connected[userConnected[key].socketId].disconnect();
+              console.log('5555555555555555555555555555555');
+            } else {
+              console.log('Socket not found');
+            }
+            
+            console.log(userConnected[key].socketId + ' vient de se déconnécter');
+          }
+        }
+        userConnected = tab;
+        io.emit('message', tab);
+        // console.log('liste updaté moins user déconnécté ' + JSON.stringify(tab));
+    }
+
+  })
+});

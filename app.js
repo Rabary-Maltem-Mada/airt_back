@@ -48,8 +48,11 @@ require('./models/User');
 require('./models/Ticket');
 require('./models/Comment');
 require('./models/Client');
+require('./models/Event');
 require('./config/passport');
 app.use(require('./routes'));
+
+var Event = mongoose.model('Event');
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -108,53 +111,32 @@ let userConnected = {};
 
 // Listening des connexions des utilisateurs
 io.on('connection', function (socket) {
-  
+  console.log('connnnnnnnnnnnnnnnected');
   // Gestion des utilisateurs
   socket.on('message', function(res){
     if (res.tag === 'userConnected') {
-        userConnected[res.user] = {id: res.user, username: res.username, socketId: socket.id};
-        socket.broadcast.emit('message', {tag: 'notifUserConnected', body: res.username + 'est maintenant connécté'});
-        io.sockets.connected[socket.id].emit('message', {tag: 'welcomeMessage', body: 'Hello, you\'re welcome' + res.username});
-
-        // Envoi liste user connected
-        const tab = [];
-        for (const key in userConnected) {
-          if (userConnected.hasOwnProperty(key)) {
-            tab.push(userConnected[key]);
-          }
-        }
-        const msg = {tag: 'listUserConnected', users: tab}
-        io.emit('message', msg);
-        console.log('111111111111111111111111111111');
+      console.log(res.message)
     }
 
-    if ( res.tag === 'mp') {
-      for (var k in userConnected) {
-        if (k === res.idReceveur || k === res.idEnvoyeur) {
-          io.sockets.connected[userConnected[k].socketId].emit('message', res);
-        } 
-      }
+    if ( res.tag === 'userDisconnected') {
+      console.log(res.message)
     }
 
-    if (res.tag === 'disconnect') {
-      var tab = [];
-        for (const key in userConnected) {
-          if (userConnected.hasOwnProperty(key) && key !== message.idUser) {
-            tab.push(userConnected[key]);
-          } else if (userConnected.hasOwnProperty(key) && key === message.idUser) {
-            if (io.sockets.connected[userConnected[key]]) {
-              io.sockets.connected[userConnected[key].socketId].disconnect();
-              console.log('5555555555555555555555555555555');
-            } else {
-              console.log('Socket not found');
-            }
-            
-            console.log(userConnected[key].socketId + ' vient de se déconnécter');
-          }
-        }
-        userConnected = tab;
-        io.emit('message', tab);
-        // console.log('liste updaté moins user déconnécté ' + JSON.stringify(tab));
+    if (res.tag === 'Ticket') {
+      console.log('messsssssssssssssssssss', res.message);
+      let event = new Event({
+        categorie: 'ticket',
+        message: JSON.stringify(res.message)
+      });
+
+      console.log('event.message', event)
+      event.save().then(function(result) {
+        io.sockets.emit("message",  JSON.parse(result.message));
+        return console.log('newwwwwwww event', JSON.parse(result.message));
+        // res.ticket = result;
+      }, error => {
+        console.log(error)
+      })
     }
 
   })

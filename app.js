@@ -131,8 +131,8 @@ io.on('connection', function (socket) {
 
       console.log('event.message', event)
       event.save().then(function(result) {
-        io.sockets.emit("message",  JSON.parse(result.message));
-        return console.log('newwwwwwww event', JSON.parse(result.message));
+        io.sockets.emit("message", JSON.parse(result.message));
+        console.log('***************************', JSON.parse(result.message));
         // res.ticket = result;
       }, error => {
         console.log(error)

@@ -15,7 +15,8 @@ var TicketSchema = new mongoose.Schema({
   favoritesCount: {type: Number, default: 0},
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   tagList: [{ type: String }],
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, {timestamps: true});
 
 TicketSchema.plugin(uniqueValidator, {message: 'is already taken'});
@@ -62,6 +63,7 @@ TicketSchema.methods.toJSONFor = function(user){
     cause: this.cause,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
+    modifiedBy: this.modifiedBy,
     tagList: this.tagList,
     favorited: user ? user.isFavorite(this._id) : false,
     favoritesCount: this.favoritesCount,
@@ -70,6 +72,5 @@ TicketSchema.methods.toJSONFor = function(user){
     client: this.client
   };
 };
-
 
 mongoose.model('Ticket', TicketSchema);

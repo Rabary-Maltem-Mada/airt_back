@@ -165,7 +165,6 @@ router.get('/all', auth.required, function(req, res, next) {
 });
   // Ticket.find().then(function(ticket){
   //   if (!ticket) { return res.sendStatus(401); }
-
   //   return res.json({
   //     tickets: ticket.map(function(tick){
   //       return tick;
@@ -191,7 +190,7 @@ router.post('/', auth.required, function(req, res, next) {
       article.client = result;  
     }
   })
-  
+
   Promise.all([ 
     User.findById(req.payload.id),
     User.findOne({username: req.body.article.technician.username})
@@ -199,6 +198,7 @@ router.post('/', auth.required, function(req, res, next) {
       
       article.author = result[0];
       article.technician = result[1];
+      article.modifiedBy = result[0];
 
       return article.save().then(function(){
         return res.json({article: article.toJSONFor(result[0])});
@@ -222,6 +222,8 @@ router.get('/:article', auth.optional, function(req, res, next) {
 
 // update article
 router.put('/:article', auth.required, function(req, res, next) {
+  console.log('req.payload.id' , req.payload.id);
+  console.log('req.body.article.modifiedBy ' , req.body.article.modifiedBy);
   User.findById(req.payload.id).then(function(user){
     if(req.article.author._id.toString() === req.payload.id.toString()){
       if(typeof req.body.article.title !== 'undefined'){
@@ -240,9 +242,16 @@ router.put('/:article', auth.required, function(req, res, next) {
         req.article.tagList = req.body.article.tagList
       }
 
-      req.article.save().then(function(article){
-        return res.json({article: article.toJSONFor(user)});
-      }).catch(next);
+      if(typeof req.body.article.modifiedBy !== 'undefined'){
+        User.findOne({username: req.body.article.modifiedBy}).then(function(user){
+          console.log('mooooooooooodifiedBy', user);
+          req.article.modifiedBy = user;
+  
+          req.article.save().then(function(article){
+            return res.json({article: article.toJSONFor(user)});
+          }).catch(next);
+        })
+      }
     } else {
       return res.sendStatus(403);
     }

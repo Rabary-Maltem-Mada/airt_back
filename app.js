@@ -31,7 +31,7 @@ app.use(bodyParser.json({limit: '5mb'}));
 app.use(require('method-override')());
 app.use(express.static(__dirname + '/public'));
 
-app.use(session({ secret: 'airt1l', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
+app.use(session({ secret: 'airt1l', cookie: { maxAge: 1800 }, resave: false, saveUninitialized: false  }));
 app.set('views', './dist/browser');
 if (!isProduction) {
   app.use(errorhandler());
@@ -123,6 +123,23 @@ io.on('connection', function (socket) {
     }
 
     if (res.tag === 'Ticket') {
+      console.log('messsssssssssssssssssss', res.message);
+      let event = new Event({
+        categorie: 'ticket',
+        message: JSON.stringify(res.message)
+      });
+
+      console.log('event.message', event)
+      event.save().then(function(result) {
+        io.sockets.emit("message", JSON.parse(result.message));
+        console.log('***************************', JSON.parse(result.message));
+        // res.ticket = result;
+      }, error => {
+        console.log(error)
+      })
+    }
+
+    if (res.tag === 'Comment') {
       console.log('messsssssssssssssssssss', res.message);
       let event = new Event({
         categorie: 'ticket',

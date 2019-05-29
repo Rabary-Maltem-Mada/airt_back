@@ -28,7 +28,8 @@ router.get('/:username', auth.optional, function(req, res, next){
 
 router.post('/:username/follow', auth.required, function(req, res, next){
   var profileId = req.profile._id;
-
+  console.log('utilisateur qui sabonne',req.payload.id)
+  console.log('req.profile._id', req.profile._id)
   User.findById(req.payload.id).then(function(user){
     if (!user) { return res.sendStatus(401); }
 
@@ -40,10 +41,10 @@ router.post('/:username/follow', auth.required, function(req, res, next){
 
 router.delete('/:username/follow', auth.required, function(req, res, next){
   var profileId = req.profile._id;
-
+  console.log('utilisateur qui se désabonne' ,req.payload.id)
+  console.log('req.profile._id', req.profile._id)
   User.findById(req.payload.id).then(function(user){
     if (!user) { return res.sendStatus(401); }
-
     return user.unfollow(profileId).then(function(){
       return res.json({profile: req.profile.toProfileJSONFor(user)});
     });

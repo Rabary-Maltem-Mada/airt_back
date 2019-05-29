@@ -1,6 +1,5 @@
 var router = require('express').Router();
 var mongoose = require('mongoose');
-var csv = require('fast-csv');
 const fs = require('fs'); 
 var Ticket = mongoose.model('Ticket');
 // const csv = require('csv-parser');

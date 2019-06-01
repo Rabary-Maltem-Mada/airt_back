@@ -152,7 +152,6 @@ router.get('/all', auth.required, function(req, res, next) {
       Ticket.count()
   ]).then(function(results){
     var articles = results[0];
-    console.log(articles);
     var articlesCount = results[1];
 
     return res.json({

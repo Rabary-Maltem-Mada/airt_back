@@ -39,6 +39,7 @@
     "passport": "0.3.2",
     "passport-local": "1.0.0",
     "request": "^2.88.0",
+    "fast-csv": "^2.4.0",
     "slug": "^0.9.3",
     "socket.io": "^2.2.0",
     "underscore": "1.8.3"

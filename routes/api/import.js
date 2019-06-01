@@ -2,7 +2,7 @@ var router = require('express').Router();
 var mongoose = require('mongoose');
 const fs = require('fs'); 
 var Ticket = mongoose.model('Ticket');
-// const csv = require('csv-parser');
+var csv = require('fast-csv');
 
 // return a list of tags
 router.post('/', async function(req, res, next) {
@@ -22,16 +22,20 @@ router.post('/', async function(req, res, next) {
     .on("data", function(data){
         data['_id'] = new mongoose.Types.ObjectId();
         tickets.push(data);
-        
+        var ticket = new Ticket(data);
+        ticket.save().then(function(author){
+            //    if (err) {throw err};
+            console.log('icccciiiiiiiiiiiiiiiii',)
+        })
     })
     .on("end", function(){
         console.log(tickets)
        var ticket = new Ticket();
-    //    autho.save().then(function(author){
-    //        if (err) {throw err};
-    //        console.log('icccciiiiiiiiiiiiiiiii', author)
-    //        res.send(authors.length + ' authors have been successfully uploaded.');
-    //     })
+       ticket.save().then(function(author){
+        //    if (err) {throw err};
+           console.log('icccciiiiiiiiiiiiiiiii', tickets.length)
+           res.send(tickets.length + ' authors have been successfully uploaded.');
+        })
     });
 });
 

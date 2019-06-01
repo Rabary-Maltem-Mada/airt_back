@@ -245,7 +245,7 @@ router.put('/:article', auth.required, function(req, res, next) {
         User.findOne({username: req.body.article.modifiedBy}).then(function(user){
           console.log('mooooooooooodifiedBy', user);
           req.article.modifiedBy = user;
-  
+
           req.article.save().then(function(article){
             return res.json({article: article.toJSONFor(user)});
           }).catch(next);

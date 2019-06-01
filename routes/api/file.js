@@ -11,7 +11,6 @@ var http = require('http'),
 router.get('/:img', async function(req, res, next) {
 
 var pic = url.parse(req.url,true).path;
-
     //read the image using fs and send the image content back in the response
     fs.readFile('./public/uploads' + pic, function (err, content) {
         if (err) {

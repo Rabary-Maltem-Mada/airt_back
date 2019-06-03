@@ -19,7 +19,7 @@ var TicketSchema = new mongoose.Schema({
   modifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, {timestamps: true});
 
-TicketSchema.plugin(uniqueValidator, {message: 'is already taken'});
+// TicketSchema.plugin(uniqueValidator, {message: 'is already taken'});
 
 TicketSchema.pre('validate', function(next){
   if(!this.slug)  {

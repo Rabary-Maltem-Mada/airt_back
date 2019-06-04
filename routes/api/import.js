@@ -47,27 +47,44 @@ router.post('/user', async function(req, res, next) {
     var users = [];
 
     var fileToRead = new Buffer(file, 'base64');
-
-    csv
-    .fromString(fileToRead.toString(), {
-        headers: true,
-        ignoreEmpty: true
-    })
-
-    .on("data", function(data){
-        data['_id'] = new mongoose.Types.ObjectId();
-        users.push(data);
-        var user = new User(data);
-        user.save().then(function(author){
+    try {
+        csv
+        .fromString(fileToRead.toString(), {
+            headers: true,
+            ignoreEmpty: true
+        })
+        .on("data", function(data){
+            const res = {};
+            res['_id'] = new mongoose.Types.ObjectId();
+            Object.keys(data).map(keys => {
+                const data_values = data[keys].split(';');
+                const data_keys = keys.split(';');
+                const length = data_keys.length;
+    
+                for(let i = 0; i < length; i++) {
+                    res[data_keys[i]] = data_values[i] ? data_values[i] : null;
+                }
+            });
+    
+            console.log("data object res.email ===> ", res.email);
+            users.push(res);
+            var user = new User();
+            user.email = res.email;
+            user.username = res.username;
+            user.save().then(function(author){
+                   if (err) {throw err};
+            }).catch(err => {console.log(err)})
+        })
+        .on("end", function(){
+           var user = new User();
+           user.save().then(function(user, err){
                if (err) {throw err};
-        })
-    })
-    .on("end", function(){
-       var user = new User();
-       user.save().then(function(user){
-           if (err) {throw err};
-           res.send(users.length + ' authors have been successfully uploaded.');
-        })
-    });
+               res.send(users.length + ' authors have been successfully uploaded.');
+            }).catch(err => {console.log(err)})
+        });
+      } catch (e) {
+        console.log(e)
+      }
+
 });
 module.exports = router;

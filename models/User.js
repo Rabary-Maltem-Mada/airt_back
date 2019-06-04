@@ -76,6 +76,18 @@ UserSchema.methods.toProfileJSONFor = function(user){
   };
 };
 
+UserSchema.methods.toAuthorJSONFor = function(user){
+  return {
+    username: this.username,
+    bio: this.bio,
+    role: this.role,
+    image: this.image || 'http://localhost/madadev/smiley-cyrus.jpg',
+    cover: this.cover,
+    following: user ? user.isFollowing(this._id) : false
+  };
+};
+
+
 UserSchema.methods.favorite = function(id){
   if(this.favorites.indexOf(id) === -1){
     this.favorites = this.favorites.concat([id]);

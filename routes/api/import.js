@@ -65,14 +65,15 @@ router.post('/user', async function(req, res, next) {
                     res[data_keys[i]] = data_values[i] ? data_values[i] : null;
                 }
             });
-    
+      
             console.log("data object res.email ===> ", res.email);
             users.push(res);
             var user = new User();
             user.email = res.email;
             user.username = res.username;
-            user.save().then(function(author){
-                   if (err) {throw err};
+            user.save().then(function(res){
+                 if (err) {throw err};
+                 return res;
             }).catch(err => {console.log(err)})
         })
         .on("end", function(){

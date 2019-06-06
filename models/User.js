@@ -61,10 +61,6 @@ UserSchema.methods.toEditJSON = function(){
     username: this.username,
     email: this.email,
     role: this.role,
-    token: this.generateJWT(),
-    bio: this.bio,
-    image: this.image,
-    cover: this.cover
   };
 };
 
@@ -99,7 +95,6 @@ UserSchema.methods.toAuthorJSONFor = function(user){
     following: user ? user.isFollowing(this._id) : false
   };
 };
-
 
 UserSchema.methods.favorite = function(id){
   if(this.favorites.indexOf(id) === -1){

@@ -55,6 +55,19 @@ UserSchema.methods.toAuthJSON = function(){
   };
 };
 
+UserSchema.methods.toEditJSON = function(){
+  return {
+    id: this.id,
+    username: this.username,
+    email: this.email,
+    role: this.role,
+    token: this.generateJWT(),
+    bio: this.bio,
+    image: this.image,
+    cover: this.cover
+  };
+};
+
 UserSchema.methods.toTicketJSON = function(){
   return {
     id: this._id,

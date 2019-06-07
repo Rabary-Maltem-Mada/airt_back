@@ -61,6 +61,7 @@ UserSchema.methods.toEditJSON = function(){
     username: this.username,
     email: this.email,
     role: this.role,
+    image: this.image || 'http://localhost/madadev/smiley-cyrus.jpg',
   };
 };
 

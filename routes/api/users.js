@@ -16,12 +16,22 @@ router.get('/user', auth.required, function(req, res, next){
   }).catch(next);
 });
 
+// get One User
 router.get('/user/:id', auth.required, function(req, res, next){
   // console.log('req.params', req.params)
   User.findById(req.params.id).then(function(user){
     if(!user){ return res.sendStatus(401); }
-
     return res.json({user: user.toEditJSON()});
+  }).catch(next);
+});
+
+// Delete user
+router.delete('/user/:id', function(req, res, next){
+  User.findById(req.params.id).then(function(user){
+    if(!user){ return res.sendStatus(401); }
+    return user.remove().then(function(){
+      return res.sendStatus(204);
+    })
   }).catch(next);
 });
 

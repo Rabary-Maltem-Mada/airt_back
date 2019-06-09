@@ -10,7 +10,7 @@ var ClientSchema = new mongoose.Schema({
 ClientSchema.methods.toJSONFor = function(user){
   return {
     id: this._id,
-    name: this.body,
+    name: this.name,
     email: this.email,
     image: this.image || 'http://localhost/madadev/client.jpg',
     createdAt: this.createdAt,

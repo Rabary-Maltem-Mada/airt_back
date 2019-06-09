@@ -18,6 +18,16 @@ router.post('/add', function(req, res, next){
   }).catch(next);
 });
 
+// return a client
+router.get('/:id', function(req, res, next){
+  console.log('req.params.idddddddddddddddd' , req.params.id);
+  var client = new Client();
+  Client.findById(req.params.id).then(function(client){
+    if(!client){ return res.sendStatus(401); }
+    return res.json({client: client.toJSONFor()});
+  }).catch(next);
+});
+
 // return a list of clients
 router.get('/', async function(req, res, next) {
   Client.find().sort({name: 1 }).then(function(client){

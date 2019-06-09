@@ -12,6 +12,7 @@ router.post('/add', function(req, res, next){
 
   client.email = req.body.email;
   client.name = req.body.name;
+  client.image = req.body.file;
   client.save().then(function(){
     return res.json({client: client.toJSONFor()});
   }).catch(next);

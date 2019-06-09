@@ -71,7 +71,7 @@ router.post('/user', async function(req, res, next) {
             var user = new User();
             user.email = res.email;
             user.username = res.username;
-            user.save().then(function(res){
+            user.save().then(function(res, err){
                  if (err) {throw err};
                  return res;
             }).catch(err => {console.log(err)})
@@ -80,7 +80,7 @@ router.post('/user', async function(req, res, next) {
            var user = new User();
            user.save().then(function(user, err){
                if (err) {throw err};
-               res.send(users.length + ' authors have been successfully uploaded.');
+               res.json(users.length + ' authors have been successfully uploaded.');
             }).catch(err => {console.log(err)})
         });
       } catch (e) {

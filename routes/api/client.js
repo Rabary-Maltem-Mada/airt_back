@@ -28,6 +28,28 @@ router.get('/:id', function(req, res, next){
   }).catch(next);
 });
 
+// update a client
+router.put('/:id', function(req, res, next){
+  console.log('req.params.idddddddddddddddd' , req.params.id);
+  Client.findById(req.params.id).then(function(client){
+    if(!client){ return res.sendStatus(401); }
+    console.log('req.body.nameeeeeeeee', req.body.name)
+    if(typeof req.body.name !== 'undefined'){
+      client.name = req.body.name;
+    }
+    if(typeof req.body.email !== 'undefined'){
+      client.email = req.body.email;
+    }
+    if(typeof req.body.image !== 'undefined'){
+      client.image = req.body.image;
+    }
+    return client.save().then(function(){
+      return res.json({client: client.toJSONFor()});
+    });
+    
+  }).catch(next);
+});
+
 // return a list of clients
 router.get('/', async function(req, res, next) {
   Client.find().sort({name: 1 }).then(function(client){

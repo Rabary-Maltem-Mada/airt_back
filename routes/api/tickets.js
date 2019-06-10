@@ -181,7 +181,6 @@ router.post('/', auth.required, function(req, res, next) {
   Client.findOne({name: req.body.article.client.name}).then(function(result) {
     if (!result) {
       client = req.body.article.client;
-      console.log('req.body.article.client', req.body.article.client.name)
       client.save().then(function(client) {
         return article.client = client;
       })
@@ -221,40 +220,46 @@ router.get('/:article', auth.optional, function(req, res, next) {
 
 // update article
 router.put('/:article', auth.required, function(req, res, next) {
-  console.log('req.payload.id' , req.payload.id);
-  console.log('req.body.article.modifiedBy ' , req.body.article.modifiedBy);
-  User.findById(req.payload.id).then(function(user){
-    if(req.article.author._id.toString() === req.payload.id.toString()){
+console.log('typeof req.body.article.client', typeof req.body.article.client)
+console.log('typeof req.body.article.technicien', typeof req.body.article.technician)
+  Ticket.findOne({slug: req.params.article}).then(function(ticket) {
+  Promise.all([ 
+    User.findById(req.payload.id),
+    User.findById(req.body.article.technician.id),
+    Client.findById(req.body.article.client._id)
+    ]).then(function(result) {
+      
       if(typeof req.body.article.title !== 'undefined'){
-        req.article.title = req.body.article.title;
+        ticket.title = req.body.article.title;
       }
 
       if(typeof req.body.article.status !== 'undefined'){
-        req.article.status = req.body.article.status;
+        ticket.status = req.body.article.status;
       }
 
       if(typeof req.body.article.body !== 'undefined'){
-        req.article.body = req.body.article.body;
+        ticket.body = req.body.article.body;
       }
 
       if(typeof req.body.article.tagList !== 'undefined'){
-        req.article.tagList = req.body.article.tagList
+        ticket.tagList = req.body.article.tagList
       }
-
-      if(typeof req.body.article.modifiedBy !== 'undefined'){
-        User.findOne({username: req.body.article.modifiedBy}).then(function(user){
-          console.log('mooooooooooodifiedBy', user);
-          req.article.modifiedBy = user;
-
-          req.article.save().then(function(article){
-            return res.json({article: article.toJSONFor(user)});
-          }).catch(next);
-        })
+      if(typeof req.body.article.client === 'object'){
+        ticket.client = result[2];
       }
-    } else {
-      return res.sendStatus(403);
-    }
-  });
+      if(typeof req.body.article.technician === 'object'){
+        ticket.technician = result[1];
+      }
+      ticket.modifiedBy = result[0];
+
+
+
+      return ticket.save().then(function(){
+        return res.json({article: ticket});
+      })
+  }).catch(next);
+});
+
 });
 
 // delete article

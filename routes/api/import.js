@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 const fs = require('fs'); 
 var Ticket = mongoose.model('Ticket');
 var User = mongoose.model('User');
+var Client = mongoose.model('Client');
 var csv = require('fast-csv');
 
 // return a list of tags
@@ -77,11 +78,62 @@ router.post('/user', async function(req, res, next) {
             }).catch(err => {console.log(err)})
         })
         .on("end", function(){
-           var user = new User();
-           user.save().then(function(user, err){
-               if (err) {throw err};
-               res.json(users.length + ' authors have been successfully uploaded.');
+        //    var user = new User();
+        //    user.save().then(function(user, err){
+        //        if (err) {throw err};
+               
+        //     }).catch(err => {console.log(err)})
+        res.json(users.length + ' authors have been successfully uploaded.');
+        });
+      } catch (e) {
+        console.log(e)
+      }
+
+});
+router.post('/client', async function(req, res, next) {
+    if (!req.body) {return res.status(400).send('No files were uploaded.');}
+
+    var file = req.body.body.file;
+    var filename = req.body.body.filename;
+    var clients = [];
+
+    var fileToRead = new Buffer(file, 'base64');
+    try {
+        csv
+        .fromString(fileToRead.toString(), {
+            headers: true,
+            ignoreEmpty: true
+        })
+        .on("data", function(data){         
+            const res = {};
+            res['_id'] = new mongoose.Types.ObjectId();
+            Object.keys(data).map(keys => {
+                const data_values = data[keys].split(';');
+                const data_keys = keys.split(';');
+                const length = data_keys.length;
+    
+                for(let i = 0; i < length; i++) {
+                    res[data_keys[i]] = data_values[i] ? data_values[i] : null;
+                }
+            });
+      
+            console.log("data object res.name ===> ", res.name);
+            clients.push(res);
+            var client = new Client();
+            client.email = res.email;
+            client.name = res.name;
+            client.save().then(function(res, err){
+                 if (err) {throw err};
+                 return res;
             }).catch(err => {console.log(err)})
+        })
+        .on("end", function(){
+            // var client = new Client();
+            // client.save().then(function(client, err){
+            //    if (err) {throw err};
+               
+            // }).catch(err => {console.log(err)})
+            res.json(clients.length + ' clients have been successfully uploaded.');
         });
       } catch (e) {
         console.log(e)

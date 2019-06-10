@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 
 var ClientSchema = new mongoose.Schema({
-  name: {type: String, required: [true, "can't be blank"]},
-  email : {type: String, lowercase: true, unique: true, required: [true, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
+  name: {type: String, required: [false, "can't be blank"]},
+  email : {type: String, lowercase: true, unique: true, required: [false, "can't be blank"], match: [/\S+@\S+\.\S+/, 'is invalid'], index: true},
   image: String,
 }, {timestamps: true});
 

@@ -50,6 +50,16 @@ router.put('/:id', function(req, res, next){
   }).catch(next);
 });
 
+// delete a client
+router.delete('/:id', function(req, res, next){
+  Client.findById(req.params.id).then(function(client){
+    if(!client){ return res.sendStatus(401); }
+    return client.remove().then(function(){
+      return res.sendStatus(204);
+    })
+  }).catch(next);
+});
+
 // return a list of clients
 router.get('/', async function(req, res, next) {
   Client.find().sort({name: 1 }).then(function(client){

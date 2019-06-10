@@ -220,46 +220,52 @@ router.get('/:article', auth.optional, function(req, res, next) {
 
 // update article
 router.put('/:article', auth.required, function(req, res, next) {
-console.log('typeof req.body.article.client', typeof req.body.article.client)
-console.log('typeof req.body.article.technicien', typeof req.body.article.technician)
   Ticket.findOne({slug: req.params.article}).then(function(ticket) {
-  Promise.all([ 
-    User.findById(req.payload.id),
-    User.findById(req.body.article.technician.id),
-    Client.findById(req.body.article.client._id)
-    ]).then(function(result) {
-      
-      if(typeof req.body.article.title !== 'undefined'){
-        ticket.title = req.body.article.title;
-      }
+    Promise.all([ 
+      User.findById(req.payload.id),
+      User.findById(req.body.article.technician.id),
+      Client.findById(req.body.article.client._id)
+      ]).then(function(result) {
+        
+        if(typeof req.body.article.title !== 'undefined'){
+          ticket.title = req.body.article.title;
+        }
 
-      if(typeof req.body.article.status !== 'undefined'){
-        ticket.status = req.body.article.status;
-      }
+        if(typeof req.body.article.status !== 'undefined'){
+          ticket.status = req.body.article.status;
+        }
 
-      if(typeof req.body.article.body !== 'undefined'){
-        ticket.body = req.body.article.body;
-      }
+        if(typeof req.body.article.body !== 'undefined'){
+          ticket.body = req.body.article.body;
+        }
 
-      if(typeof req.body.article.tagList !== 'undefined'){
-        ticket.tagList = req.body.article.tagList
-      }
-      if(typeof req.body.article.client === 'object'){
-        ticket.client = result[2];
-      }
-      if(typeof req.body.article.technician === 'object'){
-        ticket.technician = result[1];
-      }
-      ticket.modifiedBy = result[0];
+        if(typeof req.body.article.tagList !== 'undefined'){
+          ticket.tagList = req.body.article.tagList
+        }
+        if(typeof req.body.article.client === 'object'){
+          ticket.client = result[2];
+        }
+        if(typeof req.body.article.technician === 'object'){
+          ticket.technician = result[1];
+        }
+        ticket.modifiedBy = result[0];
 
+        return ticket.save().then(function(){
+          return res.json({article: ticket});
+        })
+    }).catch(next);
+  });
 
-
-      return ticket.save().then(function(){
-        return res.json({article: ticket});
-      })
-  }).catch(next);
 });
 
+// archive article
+router.get('/archive/:article', auth.required, function(req, res, next) {
+  Ticket.findOne({slug: req.params.article}).then(function(ticket) {
+    ticket.archived = true;
+    ticket.save().then(function(ticket){
+      return res.json({ticket: ticket});
+    });
+  })
 });
 
 // delete article

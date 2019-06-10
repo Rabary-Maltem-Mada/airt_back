@@ -13,6 +13,7 @@ var TicketSchema = new mongoose.Schema({
   status: String,
   body: String,
   favoritesCount: {type: Number, default: 0},
+  archived: Boolean,
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
   tagList: [{ type: String }],
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

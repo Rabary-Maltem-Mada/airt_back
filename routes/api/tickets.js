@@ -34,6 +34,8 @@ router.get('/', auth.optional, function(req, res, next) {
   var limit = 20;
   var offset = 0;
 
+  query.archived = false;
+
   if(typeof req.query.limit !== 'undefined'){
     limit = req.query.limit;
   }
@@ -62,7 +64,7 @@ router.get('/', auth.optional, function(req, res, next) {
     } else if(req.query.favorited){
       query._id = {$in: []};
     }
-
+    console.log('queeeeeeeeeeeeeeeeeeeeery', query)
     return Promise.all([
       Ticket.find(query)
         .limit(Number(limit))
@@ -105,7 +107,7 @@ router.get('/feed', auth.required, function(req, res, next) {
     if (!user) { return res.sendStatus(401); }
 
     Promise.all([
-      Ticket.find({ author: {$in: user.following}})
+      Ticket.find({ author: {$in: user.following}, archived: false})
         .limit(Number(limit))
         .skip(Number(offset))
         .populate('author')
@@ -142,7 +144,7 @@ router.get('/all', auth.required, function(req, res, next) {
   }
   User.findById(req.payload.id).then(function(user){
   Promise.all([
-    Ticket.find()
+    Ticket.find({archived: false})
       .limit(Number(limit))
       .skip(Number(offset))
       .populate('author')
@@ -258,6 +260,21 @@ router.put('/:article', auth.required, function(req, res, next) {
 
 });
 
+// get all archived tickets
+router.get('/archived/all', auth.required, function(req, res, next) {
+  User.findById(req.payload.id).then(function(user){
+      Ticket.find({archived: true})
+      .populate('client').
+      populate('technician').
+      exec().then(function(articles) {
+        return res.json({
+          articles: articles
+        });
+      })
+  });
+});
+
+
 // archive article
 router.get('/archive/:article', auth.required, function(req, res, next) {
   Ticket.findOne({slug: req.params.article}).then(function(ticket) {
@@ -266,6 +283,31 @@ router.get('/archive/:article', auth.required, function(req, res, next) {
       return res.json({ticket: ticket});
     });
   })
+});
+
+// UNarchive article
+router.get('/unarchive/:article', auth.required, function(req, res, next) {
+  Ticket.findOne({slug: req.params.article}).then(function(ticket) {
+    ticket.archived = false;
+    ticket.save().then(function(ticket){
+      return res.json({ticket: ticket});
+    });
+  })
+});
+
+// delete article
+router.delete('/:article', auth.required, function(req, res, next) {
+  User.findById(req.payload.id).then(function(user){
+    if (!user) { return res.sendStatus(401); }
+
+    if(req.article.author._id.toString() === req.payload.id.toString()){
+      return req.article.remove().then(function(){
+        return res.sendStatus(204);
+      });
+    } else {
+      return res.sendStatus(403);
+    }
+  }).catch(next);
 });
 
 // delete article

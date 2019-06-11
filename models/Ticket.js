@@ -3,6 +3,7 @@ var uniqueValidator = require('mongoose-unique-validator');
 var slug = require('slug');
 var User = mongoose.model('User');
 
+
 var TicketSchema = new mongoose.Schema({
   slug: {type: String, lowercase: true, unique: true},
   technician: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -24,25 +25,33 @@ var TicketSchema = new mongoose.Schema({
 
 TicketSchema.pre('validate', function(next){
   if(!this.slug)  {
-    this.slugify();
-  }
+    var ticket = mongoose.model('Ticket');
+    return ticket.count().then(count => {
+      const inc = 1;
+      const ref = Number(count) + Number(inc);
+      if(count < 10) {
+        this.slug = 'REF-0000' + ref;
+      } else if (count < 100){
+        this.slug = 'REF-000' + ref;
+      } else if (count < 1000) {
+        this.slug = 'REF-00' + ref;
+      } else if (count < 10000){
+        this.slug = 'REF-0' + ref;
+      } else if (count < 100000){
+        this.slug = 'REF-' + ref;
+      }
+      
+      this.archived = false;
+    })
 
+  }
   next();
 });
+
 
 TicketSchema.methods.slugify = function() {
   this.slug = slug('REF') + '-' + makeRef().toString(36);
 };
-
-function makeRef() {
-  var ref = "";  
-  var entry = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (var i = 0; i < 7; i++)
-    ref += entry.charAt(Math.floor(Math.random() * entry.length));
-
-  return ref;
-}
 
 TicketSchema.methods.updateFavoriteCount = function() {
   var article = this;

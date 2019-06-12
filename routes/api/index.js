@@ -10,6 +10,7 @@ router.use('/public/uploads', require('./file'));
 router.use('/reset', require('./reset'));
 router.use('/event', require('./event'));
 router.use('/import', require('./import'));
+router.use('/configuration', require('./configuration'));
 
 
 router.use(function(err, req, res, next){
@@ -17,7 +18,6 @@ router.use(function(err, req, res, next){
     return res.status(422).json({
       errors: Object.keys(err.errors).reduce(function(errors, key){
         errors[key] = err.errors[key].message;
-
         return errors;
       }, {})
     });

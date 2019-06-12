@@ -44,6 +44,7 @@ if(isProduction){
   mongoose.set('debug', true);
 }
 
+require('./models/Configuration');
 require('./models/User');
 require('./models/Ticket');
 require('./models/Comment');

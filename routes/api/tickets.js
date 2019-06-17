@@ -410,4 +410,43 @@ router.delete('/:article/comments/:comment', auth.required, function(req, res, n
   }
 });
 
+// get report from one date
+router.post('/report/daily', auth.required, function(req, res, next) {
+  console.log('eeeeeeeeeeeeeeee', req.body.date)
+  var theDate = new Date(req.body.date);
+
+//   Ticket.aggregate(
+//     [ {
+//       $match: { createdAt : { $gt: theDate } }
+//     },
+//     {
+//       $sort: { createdAt: 1 }
+//     }
+//  ]
+//  )
+Ticket.aggregate([
+  {
+    $project:
+      {
+        year: { $year: "$createdAt" },
+        month: { $month: "$createdAt" },
+        day: { $dayOfMonth: "$createdAt" },
+        hour: { $hour: "$createdAt" },
+        minutes: { $minute: "$createdAt" },
+        seconds: { $second: "$createdAt" },
+        milliseconds: { $millisecond: "$createdAt" },
+        dayOfYear: { $dayOfYear: "$createdAt" },
+        dayOfWeek: { $dayOfWeek: "$createdAt" },
+        week: { $week: "$createdAt" }
+      }
+  }, {
+    $match: {year: theDate.getFullYear(), month: theDate.getMonth() + 1, day: theDate.getDate() - 1}
+  }])
+ .then(function(ticket){
+    console.log(ticket)
+    return res.json({article: ticket});
+  });
+});
+
+
 module.exports = router;

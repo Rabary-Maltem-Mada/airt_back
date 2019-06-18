@@ -448,12 +448,24 @@ Ticket.aggregate([
     $match: {year: theDate.getFullYear(), month: theDate.getMonth() + 1, day: theDate.getDate()}
   },
   {
-    $lookup: {
+    $lookup: [{
         from: "clients",
         localField: "client",
         foreignField: "_id",
         as: "client"
-    }
+    },
+    {
+      from: "users",
+      localField: "technician",
+      foreignField: "_id",
+      as: "technician"
+  },
+  {
+    from: "users",
+    localField: "author",
+    foreignField: "_id",
+    as: "author"
+}]
 },])
  .then(function(ticket){
     console.log(ticket)

@@ -437,11 +437,24 @@ Ticket.aggregate([
         milliseconds: { $millisecond: "$createdAt" },
         dayOfYear: { $dayOfYear: "$createdAt" },
         dayOfWeek: { $dayOfWeek: "$createdAt" },
-        week: { $week: "$createdAt" }
+        week: { $week: "$createdAt" },
+        slug : 1,
+        title : 1,
+        author : 1,
+        technician : 1,
+        client : 1,
       }
   }, {
-    $match: {year: theDate.getFullYear(), month: theDate.getMonth() + 1, day: theDate.getDate() - 1}
-  }])
+    $match: {year: theDate.getFullYear(), month: theDate.getMonth() + 1, day: theDate.getDate()}
+  },
+  {
+    $lookup: {
+        from: "clients",
+        localField: "client",
+        foreignField: "_id",
+        as: "client"
+    }
+},])
  .then(function(ticket){
     console.log(ticket)
     return res.json({article: ticket});

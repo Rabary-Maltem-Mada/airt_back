@@ -412,18 +412,7 @@ router.delete('/:article/comments/:comment', auth.required, function(req, res, n
 
 // get report from one date
 router.post('/report/daily', auth.required, function(req, res, next) {
-  console.log('eeeeeeeeeeeeeeee', req.body.date)
   var theDate = new Date(req.body.date);
-
-//   Ticket.aggregate(
-//     [ {
-//       $match: { createdAt : { $gt: theDate } }
-//     },
-//     {
-//       $sort: { createdAt: 1 }
-//     }
-//  ]
-//  )
 Ticket.aggregate([
   {
     $project:
@@ -477,5 +466,16 @@ Ticket.aggregate([
   });
 });
 
-
+router.post('/report/weekly', auth.required, function(req, res, next) {
+  var theDate = new Date(req.body.date);
+  var ObjectID = require('mongodb').ObjectID
+Ticket.find({
+  _id: {
+    $gt: ObjectID.createFromTime(Date.now() / 1000 - 24*60*60)
+  }
+    }, callback).then(function(ticket){
+    console.log(ticket)
+    return res.json({article: ticket});
+  });
+});
 module.exports = router;
